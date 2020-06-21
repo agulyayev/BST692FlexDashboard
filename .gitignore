@@ -19,6 +19,8 @@
 
 # RStudio files
 .Rproj.user/
+*.Rproj
+Trash.R
 
 # produced vignettes
 vignettes/*.html
@@ -37,3 +39,15 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# Data folders and files
+*.Rds
+*.rds
+*.RDS 
+*.xlsx
+*.xls
+*.csv
+data/
+Data/
+DATA/
+
