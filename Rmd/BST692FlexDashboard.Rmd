@@ -1,13 +1,52 @@
 ---
-title: "Untitled"
+title: "Covid-19 Florida Data by County"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
-    vertical_layout: fill
+    social: ["twitter"]
+    source_code: https://github.com/chol3ra/BST692FlexDashboard
+date: "`r Sys.Date()`"
+runtime: shiny
 ---
+
+<style>
+.navbar {
+  background-color: #15dcb2ff;
+  border-color: #15dcb2ff
+}
+
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+    background-color: #c35dca;
+    color: white;
+}
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+  color: white;
+  background-color: #c35dca;
+}
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus {
+  background-color: #c35dca;
+}
+.navbar-inverse .navbar-collapse,
+.navbar-inverse .navbar-form {
+  border-color: #c35dca;
+}
+</style>
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(shiny)
+library(tidyverse)
+library(readr)
+
+us_counties <- read_csv("~/covid-19-data/live/us-counties.csv", 
+                        col_types = cols(date = col_date(format = "%Y-%m-%d")))
+
+fl_counties <- filter(us_counties, state == "Florida")
+saveRDS(us_counties, file = ".//Rmd/fl_counties.rds")
 ```
 
 Column {data-width=650}
