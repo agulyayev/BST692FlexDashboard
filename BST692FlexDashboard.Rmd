@@ -40,13 +40,15 @@ runtime: shiny
 library(flexdashboard)
 library(shiny)
 library(tidyverse)
+library(knitr)
 library(readr)
 
-us_counties <- read_csv("~/covid-19-data/live/us-counties.csv", 
-                        col_types = cols(date = col_date(format = "%Y-%m-%d")))
+us_counties <- read_csv("us-counties.csv", 
+    col_types = cols(date = col_date(format = "%Y-%m-%d")))
+saveRDS(us_counties, file = "fl_counties.rds")
 
 fl_counties <- filter(us_counties, state == "Florida")
-saveRDS(us_counties, file = ".//Rmd/fl_counties.rds")
+
 ```
 
 Column {data-width=650}
