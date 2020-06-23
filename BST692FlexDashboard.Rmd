@@ -9,7 +9,6 @@ date: "`r Sys.Date()`"
 runtime: shiny
 ---
 
-# to prettify the top bar
 <style>
 .navbar {
   background-color: #15dcb2ff;
