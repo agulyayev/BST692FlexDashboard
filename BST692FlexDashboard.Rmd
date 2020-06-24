@@ -1,10 +1,14 @@
 ---
-title: "Covid-19 Florida Data by County"
+title: "Alex Gulyayev: Covid-19 Florida Data by County"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
+    vertical_layout: fill
     social: ["twitter"]
+    url: https://google.com
     source_code: https://github.com/chol3ra/BST692FlexDashboard
+    navbar: 
+      - { icon: "fas fa-info-circle", href: "https://www.cdc.gov/coronavirus/2019-ncov/index.html", align: right}
 date: "`r Sys.Date()`"
 runtime: shiny
 ---
@@ -44,19 +48,23 @@ library(shiny)
 library(tidyverse)
 library(readr)
 
-# Import data
+# Read live data
+us_countiesLive <- read_csv("live/us-counties.csv", 
+    col_types = cols(date = col_date(format = "%Y-%m-%d")))
+
+# Read archived data
 us_counties <- read_csv("us-counties.csv", 
     col_types = cols(date = col_date(format = "%Y-%m-%d")))
-saveRDS(us_counties, file = "fl_counties.rds")
 
-# Filter by Florida
-fl_counties <- filter(us_counties, state == "Florida") %>% 
+# Filter live data by Florida
+fl_countiesLive <- us_countiesLive %>% 
+  filter(state == "Florida") %>% 
+  select(-c(state, probable_cases, probable_deaths))
+
+# Filter archived data by Florida
+fl_counties <- us_counties %>% 
+  filter(state == "Florida") %>%
   select(-state)
-   
-# Filter by the last date recorded in the dataset
-fl_counties_count <- fl_counties  %>% 
-  select(date, cases, deaths, county) %>%
-  filter(date == as.Date("2020-06-20")) 
 
 ```
 
@@ -70,8 +78,8 @@ Row
 
 ```{r Covid positive count}
 
-# Total positive cases
-fl_covidPos <- sum(fl_counties_count$cases)
+# Total confirmed positive cases
+fl_covidPos <- sum(fl_countiesLive$confirmed_cases)
 valueBox(fl_covidPos, icon = "fa-user-plus", color = "#ff9933")
 ```
 
@@ -80,7 +88,7 @@ valueBox(fl_covidPos, icon = "fa-user-plus", color = "#ff9933")
 ```{r Covid deaths count}
 
 # Total death count
-fl_covidDeath <- sum(fl_counties_count$deaths)
+fl_covidDeath <- sum(fl_countiesLive$confirmed_deaths)
 valueBox(fl_covidDeath, icon = "far fa-sad-tear", color = "#009999")
 ```
 
@@ -89,8 +97,9 @@ valueBox(fl_covidDeath, icon = "far fa-sad-tear", color = "#009999")
 ```{r Count with highest # of cases and deaths}
 
 # Sum number of cases and deaths
-  fl_counties_cd <- fl_counties_count %>% 
-    mutate(CasesDeaths = select(., cases:deaths) %>% rowSums(na.rm = TRUE))
+fl_counties_cd <- fl_countiesLive %>% 
+  mutate(CasesDeaths = select(., confirmed_cases:confirmed_deaths) %>%
+           rowSums(na.rm = TRUE))
 # To display a county with the highest total of cases and deaths
   CasesDeathsCount  <- fl_counties_cd %>% 
     slice(which.max(CasesDeaths)) %>%
@@ -105,13 +114,14 @@ Row
 
 ```{r plot cases vs time}
 
-library(tidyverse)
-ggplot(fl_counties, aes(x=date, y=cases)) +
+ggplot(fl_counties, aes(x=date, y=cases, color = "red")) +
+  guides(color = FALSE) +
   theme_minimal() +
   geom_line() + 
   labs (x = "Days since March 1",
         y = "Number of Cases") +
   scale_x_date(date_breaks = "2 weeks", date_labels = "%b %d")
+
 ```
 
 ### What are the COVID-19 Symptoms?
@@ -129,6 +139,7 @@ Row
 
 ### Data Table of Raw Data
 
+
 ```{r raw data table}
 
 DT::datatable(fl_counties, options = list(
@@ -139,7 +150,7 @@ DT::datatable(fl_counties, options = list(
 
 Row {data-height=100}
 -------------------------------------
-
+ 
 ```{r raw data download link}
 
 fluidRow(
@@ -150,5 +161,4 @@ fluidRow(
  })
 )
 ```
-
 
